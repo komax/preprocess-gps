@@ -3,14 +3,27 @@
 import os
 import sys
 import glob
+import csv
+
+tmp_file = '/tmp/tmp.csv'
+
+def strip_iblue747(file_name):
+    with open(file_name, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        with open(tmp_file, 'w') as stripped_csv:
+            csv_writer = csv.writer(stripped_csv, delimiter=',')
+            for row in csv_reader:
+                stripped_row = row[0:14] + row[-1:]
+                csv_writer.writerow(stripped_row)
 
 def generate_gpx(csv_file):
     (file_name, file_ext) = os.path.splitext(csv_file)
     assert file_ext == '.csv'
     assert csv_file.endswith('.csv')
+    strip_iblue747(csv_file)
 
-    command_string = "gpsbabel -i iblue747 -f %s.csv -o gpx -F %s.gpx" %\
-      (file_name, file_name)
+    command_string = "gpsbabel -i iblue747 -f %s -o gpx -F %s.gpx" %\
+      (tmp_file, file_name)
     print(command_string)
     os.system(command_string)
 
