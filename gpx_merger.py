@@ -6,7 +6,7 @@ import glob
 
 def merge_gpx(directory_name, out_file):
     parameter_str = ''
-    for gpx_file in glob.glob(directory_name+'*.gpx'):
+    for gpx_file in glob.glob(directory_name+'/*.gpx'):
         parameter_str += ' -f %s' % (gpx_file)
 
     if not parameter_str:
