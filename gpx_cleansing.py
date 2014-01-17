@@ -48,6 +48,7 @@ def simplify_gpx(gpx_file_name, alpha_error):
             gpx = gpxpy.parse(gpx_file)
             gpx.simplify(alpha_error)
             with open(out_file_name, 'w') as out_file:
+                print("writing file: %s" % out_file_name)
                 out_file.write(gpx.to_xml())
     else:
         # Use gpsbabel on the commandline.
@@ -82,14 +83,13 @@ if __name__ == '__main__':
                         help='Apply Douglas-Peuker filter')
     args = parser.parse_args()
     dir_name = args.input
-    print(args.drop_outlier)
     if args.drop_outlier:
         if os.path.isdir(dir_name):
             clean_up_gpx_directory(dir_name, args.drop_outlier)
         else:
             clean_up_gpx(dir_name, args.drop_outlier)
     if args.simplify:
-        if os.path.isabs(dir_name):
+        if os.path.isdir(dir_name):
             simplify_gpx_directory(dir_name, args.simplify)
         else:
             simplify_gpx(dir_name, args.simplify)
