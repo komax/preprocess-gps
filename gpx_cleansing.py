@@ -19,10 +19,14 @@ def clean_up_gpx(gpx_file_name, precision):
     return
 
 
-def clean_up_gpx_directory(directory, precision):
+def apply_on_gpx_directory(directory, function, *fun_args):
     for gpx_file in glob.glob(directory + '/*.gpx'):
-        clean_up_gpx(gpx_file, precision)
+        function(gpx_file, *fun_args)
     return
+
+
+def clean_up_gpx_directory(directory, precision):
+    return apply_on_gpx_directory(directory, precision)
 
 
 def is_gpxpy_installed():
@@ -53,9 +57,7 @@ def simplify_gpx(gpx_file_name, alpha_error):
 
 
 def simplify_gpx_directory(directory, alpha_error):
-    for gpx_file in glob.glob(directory + '/*.gpx'):
-        clean_up_gpx(gpx_file, alpha_error)
-    return
+    return apply_on_gpx_directory(directory, alpha_error)
 
 
 def precision(s):
