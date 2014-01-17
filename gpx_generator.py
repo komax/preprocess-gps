@@ -21,7 +21,6 @@ def strip_iblue747(file_name):
 def generate_gpx(csv_file):
     (file_name, file_ext) = os.path.splitext(csv_file)
     assert file_ext == '.csv'
-    assert csv_file.endswith('.csv')
     strip_iblue747(csv_file)
 
     command_string = "gpsbabel -i iblue747 -f %s -o gpx -F %s.gpx" %\
