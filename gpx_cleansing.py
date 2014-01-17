@@ -25,6 +25,32 @@ def clean_up_gpx_directory(directory, precision):
     return
 
 
+def is_gpxpy_installed():
+    try:
+        import gpxpy
+        return True
+    except ImportError:
+        return False
+
+
+def simplify_gpx(gpx_file_name, alpha_error):
+    (file_name, file_ext) = os.path.splitext(gpx_file_name)
+    out_file_name = file_name + '_simplified' + file_ext
+    assert file_ext == '.gpx'
+    if is_gpxpy_installed():
+        # Use gpxpy package.
+        import gpxpy
+        with open(gpx_file_name, 'r') as gpx_file:
+            gpx = gpxpy.parse(gpx_file)
+            gpx.simplify(alpha_error)
+            with open(out_file_name, 'w') as out_file:
+                out_file.write(gpx.to_xml())
+    else:
+        # Use gpsbabel on the commandline.
+        # TODO Implementation
+    return
+
+
 def precision(s):
     try:
         hdop, vdop = map(int, s.split(','))
@@ -43,6 +69,8 @@ if __name__ == '__main__':
                         help='input gpx file or directory')
     parser.add_argument('-d', '--drop-outlier', type=precision,
                         help='detect and drop outliers hdop,vdop')
+    parser.add_argument('-s', '--simplify', type=int,
+                        help='Apply Douglas-Peuker filter')
     args = parser.parse_args()
     dir_name = args.input
     print(args.drop_outlier)
