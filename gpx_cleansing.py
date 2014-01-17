@@ -48,6 +48,13 @@ def simplify_gpx(gpx_file_name, alpha_error):
     else:
         # Use gpsbabel on the commandline.
         # TODO Implementation
+        pass
+    return
+
+
+def simplify_gpx_directory(directory, alpha_error):
+    for gpx_file in glob.glob(directory + '/*.gpx'):
+        clean_up_gpx(gpx_file, alpha_error)
     return
 
 
@@ -79,3 +86,8 @@ if __name__ == '__main__':
             clean_up_gpx_directory(dir_name, args.drop_outlier)
         else:
             clean_up_gpx(dir_name, args.drop_outlier)
+    if args.simplify:
+        if os.path.isabs(dir_name):
+            simplify_gpx_directory(dir_name, args.simplify)
+        else:
+            simplify_gpx(dir_name, args.simplify)
