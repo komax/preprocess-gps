@@ -26,7 +26,7 @@ def apply_on_gpx_directory(directory, function, *fun_args):
 
 
 def clean_up_gpx_directory(directory, epsilon):
-    return apply_on_gpx_directory(directory, epsilon)
+    return apply_on_gpx_directory(directory, clean_up_gpx, epsilon)
 
 
 def is_gpxpy_installed():
@@ -58,7 +58,7 @@ def simplify_gpx(gpx_file_name, alpha_error):
 
 
 def simplify_gpx_directory(directory, alpha_error):
-    return apply_on_gpx_directory(directory, alpha_error)
+    return apply_on_gpx_directory(directory, simplify_gpx, alpha_error)
 
 
 def precision(s):
