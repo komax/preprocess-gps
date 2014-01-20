@@ -5,11 +5,11 @@ import glob
 import argparse
 
 
-def clean_up_gpx(gpx_file_name, epsilon):
-    (file_name, file_ext) = os.path.splitext(gpx_file_name)
-    assert file_ext == '.gpx'
+def clean_up_gpx(gpx_file_name, epsilon, out_dir):
+    assert gpx_file_name.endswith('.gpx')
+    (in_dir, file_name) = os.path.split(gpx_file_name)
 
-    out_file_name = file_name + '_dropped_outliers' + file_ext
+    out_file_name = out_dir + '/' + file_name[:-4] + '_dropped_outliers.gpx'
     filter_option = "discard,hdop=%s,vdop=%s,hdopandvdop" % epsilon
     command_string = \
         "gpsbabel -i gpx -f %s -x %s -o gpx -F %s" %\
@@ -25,8 +25,8 @@ def apply_on_gpx_directory(directory, function, *fun_args):
     return
 
 
-def clean_up_gpx_directory(directory, epsilon):
-    return apply_on_gpx_directory(directory, clean_up_gpx, epsilon)
+def clean_up_gpx_directory(directory, epsilon, out_dir):
+    return apply_on_gpx_directory(directory, clean_up_gpx, epsilon, out_dir)
 
 
 def is_gpxpy_installed():
@@ -37,10 +37,12 @@ def is_gpxpy_installed():
         return False
 
 
-def simplify_gpx(gpx_file_name, alpha_error):
-    (file_name, file_ext) = os.path.splitext(gpx_file_name)
-    out_file_name = file_name + '_simplified' + file_ext
-    assert file_ext == '.gpx'
+def simplify_gpx(gpx_file_name, alpha_error, out_dir):
+    assert gpx_file_name.endswith('.gpx')
+    (in_dir, file_name) = os.path.split(gpx_file_name)
+    out_file_name = "%s/%s_simplified_d_%i.gpx" %\
+                    (out_dir, file_name[:-4], alpha_error)
+
     if is_gpxpy_installed():
         # Use gpxpy package.
         import gpxpy
@@ -57,8 +59,9 @@ def simplify_gpx(gpx_file_name, alpha_error):
     return
 
 
-def simplify_gpx_directory(directory, alpha_error):
-    return apply_on_gpx_directory(directory, simplify_gpx, alpha_error)
+def simplify_gpx_directory(directory, alpha_error, out_dir):
+    return apply_on_gpx_directory(directory, simplify_gpx,
+                                  alpha_error, out_dir)
 
 
 def precision(s):
@@ -81,15 +84,17 @@ if __name__ == '__main__':
                         help='detect and drop outliers hdop,vdop')
     parser.add_argument('-s', '--simplify', type=int,
                         help='Apply Douglas-Peuker filter')
+    parser.add_argument('-o', '--out-dir', type=str, default='.',
+                        help='directory to write the data in')
     args = parser.parse_args()
     dir_name = args.input
     if args.drop_outlier:
         if os.path.isdir(dir_name):
-            clean_up_gpx_directory(dir_name, args.drop_outlier)
+            clean_up_gpx_directory(dir_name, args.drop_outlier, args.out_dir)
         else:
-            clean_up_gpx(dir_name, args.drop_outlier)
+            clean_up_gpx(dir_name, args.drop_outlier, args.out_dir)
     if args.simplify:
         if os.path.isdir(dir_name):
-            simplify_gpx_directory(dir_name, args.simplify)
+            simplify_gpx_directory(dir_name, args.simplify, args.out_dir)
         else:
-            simplify_gpx(dir_name, args.simplify)
+            simplify_gpx(dir_name, args.simplify, args.out_dir)
