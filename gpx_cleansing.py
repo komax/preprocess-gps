@@ -37,13 +37,18 @@ def is_gpxpy_installed():
         return False
 
 
-def simplify_gpx(gpx_file_name, alpha_error, out_dir):
+def simplify_gpx(gpx_file_name, alpha_error, out_dir, select_gpsbabel=False):
     assert gpx_file_name.endswith('.gpx')
     (in_dir, file_name) = os.path.split(gpx_file_name)
     out_file_name = "%s/%s_simplified_d_%i.gpx" %\
                     (out_dir, file_name[:-4], alpha_error)
 
-    if is_gpxpy_installed():
+    if select_gpsbabel:
+        selection_method = False
+    else:
+        selection_method = is_gpxpy_installed()
+
+    if selection_method:
         # Use gpxpy package.
         import gpxpy
         with open(gpx_file_name, 'r') as gpx_file:
@@ -54,8 +59,12 @@ def simplify_gpx(gpx_file_name, alpha_error, out_dir):
                 out_file.write(gpx.to_xml())
     else:
         # Use gpsbabel on the commandline.
-        # TODO Implementation
-        pass
+        alpha_in_kilometers = alpha_error / 1000
+        filter_option = "simplify,error=%sk" % alpha_in_kilometers
+        command_string = "gpsbabel -i gpx -f %s -x %s -o gpx -F %s" %\
+                         (gpx_file_name, filter_option, out_file_name)
+        print(command_string)
+        os.system(command_string)
     return
 
 
