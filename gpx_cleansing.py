@@ -5,12 +5,12 @@ import glob
 import argparse
 
 
-def clean_up_gpx(gpx_file_name, precision):
+def clean_up_gpx(gpx_file_name, epsilon):
     (file_name, file_ext) = os.path.splitext(gpx_file_name)
     assert file_ext == '.gpx'
 
     out_file_name = file_name + '_dropped_outliers' + file_ext
-    filter_option = "discard,hdop=%s,vdop=%s,hdopandvdop" % precision
+    filter_option = "discard,hdop=%s,vdop=%s,hdopandvdop" % epsilon
     command_string = \
         "gpsbabel -i gpx -f %s -x %s -o gpx -F %s" %\
         (gpx_file_name, filter_option, out_file_name)
@@ -25,8 +25,8 @@ def apply_on_gpx_directory(directory, function, *fun_args):
     return
 
 
-def clean_up_gpx_directory(directory, precision):
-    return apply_on_gpx_directory(directory, precision)
+def clean_up_gpx_directory(directory, epsilon):
+    return apply_on_gpx_directory(directory, epsilon)
 
 
 def is_gpxpy_installed():
